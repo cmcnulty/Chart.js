@@ -7,6 +7,8 @@ import { Color } from './color';
 import { Element } from './element';
 import { ChartArea, Point } from './geometric';
 import { LayoutItem, LayoutPosition } from './layout';
+import { RenderTextOpts } from './helpers/helpers.canvas';
+import { CanvasFontSpec } from './helpers';
 
 export { DateAdapter, TimeUnit, _adapters } from './adapters';
 export { Animation, Animations, Animator, AnimationEvent } from './animation';
@@ -1309,6 +1311,7 @@ export interface Scale<O extends CoreScaleOptions = CoreScaleOptions> extends El
   getMinMax(canStack: boolean): { min: number; max: number };
   getTicks(): Tick[];
   getLabels(): string[];
+  getLabelItems(chartArea?: ChartArea): LabelItem[];
   beforeUpdate(): void;
   configure(): void;
   afterUpdate(): void;
@@ -1352,6 +1355,12 @@ export interface ScriptableScalePointLabelContext {
   type: string;
 }
 
+export interface LabelItem {
+  label: string | string[];
+  font: CanvasFontSpec;
+  textOffset: number;
+  renderTextOptions: RenderTextOpts;
+}
 
 export const Ticks: {
   formatters: {
