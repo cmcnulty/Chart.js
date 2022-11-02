@@ -5161,6 +5161,10 @@ class Scale extends Element {
     const data = this.chart.data;
     return this.options.labels || (this.isHorizontal() ? data.xLabels : data.yLabels) || data.labels || [];
   }
+  getLabelItems(chartArea = this.chart.chartArea) {
+    const items = this._labelItems || (this._labelItems = this._computeLabelItems(chartArea));
+    return items;
+  }
   beforeLayout() {
     this._cache = {};
     this._dataLimitsCached = false;
@@ -5816,17 +5820,19 @@ class Scale extends Element {
         };
       }
       items.push({
-        rotation,
         label,
         font,
-        color,
-        strokeColor,
-        strokeWidth,
         textOffset,
-        textAlign: tickTextAlign,
-        textBaseline,
-        translation: [x, y],
-        backdrop,
+        renderTextOptions: {
+          rotation,
+          color,
+          strokeColor,
+          strokeWidth,
+          textAlign: tickTextAlign,
+          textBaseline,
+          translation: [x, y],
+          backdrop,
+        }
       });
     }
     return items;
@@ -6024,14 +6030,13 @@ class Scale extends Element {
     if (area) {
       clipArea(ctx, area);
     }
-    const items = this._labelItems || (this._labelItems = this._computeLabelItems(chartArea));
-    let i, ilen;
-    for (i = 0, ilen = items.length; i < ilen; ++i) {
-      const item = items[i];
+    const items = this.getLabelItems(chartArea);
+    for (const item of items) {
+      const renderTextOptions = item.renderTextOptions;
       const tickFont = item.font;
       const label = item.label;
-      let y = item.textOffset;
-      renderText(ctx, label, 0, y, tickFont, item);
+      const y = item.textOffset;
+      renderText(ctx, label, 0, y, tickFont, renderTextOptions);
     }
     if (area) {
       unclipArea(ctx);
